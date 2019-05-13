@@ -234,15 +234,15 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
                 if((rfcRecData[i] == 0xff.toByte()) && (rfcRecData[i + 1] == 0x55.toByte())) {
                     isRfcRecHead = true;
                     // Log.d(ktLog, "rfc header is detected")
-                    if(rfcRecDataLen >= i + rfcRecData[i + 3] + 5) {
-                        val rfcCmd = ByteArray(rfcRecData[1] + 3)
+                    if(rfcRecDataLen >= i + rfcRecData[i + 5] + 7) {
+                        val rfcCmd = ByteArray(rfcRecData[i + 5] + 7)
                         // Log.d(ktLog, "rfc command is detected ${i}")
-                        System.arraycopy(rfcRecData, i + 2, rfcCmd, 0, 3 + rfcRecData[i + 3])
-                        rfcRecDataLen -= i + 5 + rfcRecData[i + 3]
-                        System.arraycopy(rfcRecData, i + 5 + rfcRecData[i + 3], rfcRecData, 0, rfcRecDataMaxLen - (i + 5 + rfcRecData[i + 3]))
+                        System.arraycopy(rfcRecData, i, rfcCmd, 0, rfcRecData[i + 5] + 7)
+                        rfcRecDataLen -= i + rfcRecData[i + 5] + 7
+                        System.arraycopy(rfcRecData, i + 7 + rfcRecData[i + 5], rfcRecData, 0, rfcRecDataMaxLen - (i + 7 + rfcRecData[i + 5]))
                         if(myBtCheckSum(rfcCmd)) {
                             isRfcRecCmd = true
-                            btReadMsg = Message.obtain(null, 2, btDevice, 2, rfcCmd[1] + 3)
+                            btReadMsg = Message.obtain(null, 2, btDevice, 2)
                             btReadBundle.putByteArray("rfcCmd", rfcCmd)
                             btReadMsg.data = btReadBundle
                             sendMsgToClient(btReadMsg)
@@ -314,22 +314,19 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
 
     fun myBtCheckSum(cmdBuf: ByteArray): Boolean {
         var chksum = 0
-        for(i in 0 .. cmdBuf[1] + 1)
+        for(i in 2 until cmdBuf[5] + 6)
             chksum += cmdBuf[i].toInt().and(0xff)
         chksum = chksum.inv().and(0xff)
-        if(chksum == (cmdBuf[cmdBuf[1] + 2]).toInt().and(0xff))
+        if(chksum == (cmdBuf[cmdBuf[5] + 6]).toInt().and(0xff))
             return true
         else {
-            (cmdBuf[cmdBuf[1] + 2]) = chksum.toByte()
+            (cmdBuf[cmdBuf[5] + 6]) = chksum.toByte()
             return false
         }
     }
 
     fun rfcCmdSend(cmdBuf: ByteArray) {
-        val cmdHeader = byteArrayOf(0xff.toByte(), 0x55)
-
         if(isBtConnected) {
-            rfcSocket.outputStream.write(cmdHeader)
             myBtCheckSum(cmdBuf)
             rfcSocket.outputStream.write(cmdBuf)
         }

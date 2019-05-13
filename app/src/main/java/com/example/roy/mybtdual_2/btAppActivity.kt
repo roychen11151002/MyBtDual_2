@@ -47,8 +47,8 @@ class btAppActivity : AppCompatActivity() {
 
     val serviceConn = object: ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val getFwCmd = byteArrayOf(0x40, 0 ,0x00)
-            val getNameCmd = byteArrayOf(0x48, 0 ,0x00)
+            val getFwCmd = byteArrayOf(0xff.toByte(), 0x55, 0xf0.toByte(), 0x06, 0x30, 0, 0x00)
+            val getNameCmd = byteArrayOf(0xff.toByte(), 0x55, 0xf0.toByte(), 0x06, 0x40, 0, 0x00)
             val msg = Message.obtain(null, 100, 0, 0)
 
             Log.d(KotlinLog, "onServiceConnected")
