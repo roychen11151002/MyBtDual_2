@@ -395,11 +395,12 @@ class MainActivity : AppCompatActivity() {
         // val len = cmdBuf[1]
         // for(i: Int in 0..len + 1)
         // Log.d(ktLog, "${rfcRecData[i]}")
-        Log.d(KotlinLog, "command src ${cmdBuf[2]} id ${cmdBuf[4]}")
+        // Log.d(KotlinLog, "command src ${cmdBuf[2].toString(16)} id ${cmdBuf[4].toString(16)}")
         when(cmdBuf[4]) {
-            0x25.toByte() -> Log.d(KotlinLog, " AG volume set")
-            0x9b.toByte() -> Log.d(KotlinLog, " HFP volume set")
-            else -> Log.d(KotlinLog, "other command data: ${cmdBuf[2].toString(16)} ${cmdBuf[3].toString(16)} ${cmdBuf[4].toString(16)} ${cmdBuf[5].toString(16)} ${cmdBuf[6].toString(16)} ${cmdBuf[7].toString(16)} ${cmdBuf[8].toString(16)} ${cmdBuf[9].toString(16)}")
+            0x5.toByte() -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} AG volume set")
+            0x7.toByte() -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} HFP volume set")
+            0x49.toByte() -> Log.d(KotlinLog, " src ${cmdBuf[2].toString(16)} HFP status get")
+            else -> Log.d(KotlinLog, "other command data: ${cmdBuf[2].toString(16)} ${cmdBuf[3].toString(16)} ${cmdBuf[4].toString(16)} ${cmdBuf[5].toString(16)}")
         }
     }
 }
