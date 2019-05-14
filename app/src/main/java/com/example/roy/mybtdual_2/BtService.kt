@@ -248,6 +248,7 @@ class MyBtDevice(var btMessenger: Messenger, var btBda: String, var btDevice: In
                             sendMsgToClient(btReadMsg)
                             isRfcRecHead = false
                             i = 0
+                            sleep(1)
                             continue
                         }
                     }
